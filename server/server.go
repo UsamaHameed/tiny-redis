@@ -6,6 +6,8 @@ import (
 	"net"
 	"strings"
 	"sync"
+
+	"github.com/UsamaHameed/tiny-redis/commands"
 )
 
 type server struct {
@@ -14,6 +16,7 @@ type server struct {
     connection  chan net.Conn
     shutdown    chan struct{}
 }
+
 func (s *server) handleConnection(conn net.Conn) {
     fmt.Println("connected to", conn.RemoteAddr().String())
 
@@ -27,17 +30,19 @@ func (s *server) handleConnection(conn net.Conn) {
         }
 
         str := strings.TrimSpace(string(data))
-        fmt.Println("received tcp packet", str)
+        fmt.Println("received command", str)
 
         if str == "STOP" {
             fmt.Println("closed connection with", conn.RemoteAddr().String())
             break
         }
 
-        res := "hello world from the server"
+        res := commands.ParseCommand(str)
 
-        fmt.Println("responding with", res, "to", conn.RemoteAddr().String())
-        conn.Write([]byte(res))
+        if res.Success {
+            fmt.Println("responding with", res, "to", conn.RemoteAddr().String())
+            conn.Write([]byte(res.Response))
+        }
 
     }
     conn.Close()
