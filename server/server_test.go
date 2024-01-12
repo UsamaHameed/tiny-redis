@@ -1,11 +1,9 @@
-package test
+package server
 
 import (
 	_ "fmt"
 	_ "net"
 	"testing"
-
-	_ "github.com/UsamaHameed/tiny-redis/server"
 )
 
 func TestServer(t *testing.T) {
