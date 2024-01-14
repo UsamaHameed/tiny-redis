@@ -18,10 +18,7 @@ type ParseCommandResponse struct {
 }
 
 func ParseCommand(input string) []string {
-    //chunks := strings.Split(input, " ")
-    //comm := chunks[0]
-
-    p := parser.New(input)
+    p := parser.New(input, "\\r\\n")
     p.ParseRespString()
     fmt.Println("commands", p.Commands)
 

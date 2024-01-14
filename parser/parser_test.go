@@ -44,28 +44,28 @@ func TestParser(t *testing.T) {
     }
 
     for _, test := range tests {
-        p := New(test.input)
+        p := New(test.input, DEFAULT_DELIMITER)
         err := p.ParseRespString()
 
         if err != nil {
             t.Fatalf("ParseRespString returned an error, %s", err)
         }
 
-        if len(p.commands) != test.expectedLength {
+        if len(p.Commands) != test.expectedLength {
             t.Fatalf("Parser returned wrong length, expected=%d, got=%d",
-            test.expectedLength, len(p.commands))
+            test.expectedLength, len(p.Commands))
         }
 
-        if !reflect.DeepEqual(p.commands, test.expectedCommands) {
-            t.Fatalf("Parser returned wrong commands, expected=%v, got=%v",
-            test.expectedCommands, p.commands)
+        if !reflect.DeepEqual(p.Commands, test.expectedCommands) {
+            t.Fatalf("Parser returned wrong Commands, expected=%v, got=%v",
+            test.expectedCommands, p.Commands)
         }
     }
 }
 
 func TestAdvancePointer(t *testing.T) {
     input := "*3\r\n$3\r\nSET\r\n"
-    p := New(input)
+    p := New(input, DEFAULT_DELIMITER)
 
     if p.currPos != 0 {
         t.Fatalf("incorrect initial currPos, expected=%d, got=%d", 0, p.currPos)
@@ -85,7 +85,7 @@ func TestAdvancePointer(t *testing.T) {
 func TestParseSimpleString(t *testing.T) {
     input := "+PING\r\n"
 
-    p := New(input)
+    p := New(input, DEFAULT_DELIMITER)
     err := p.parseSimpleString()
 
     if err != nil { // command.PING is 0
@@ -96,15 +96,15 @@ func TestParseSimpleString(t *testing.T) {
 func TestParseBulkString(t *testing.T) {
     input := "$3\r\nSETxx"
 
-    p := New(input)
+    p := New(input, DEFAULT_DELIMITER)
     err := p.ParseBulkString()
 
     if err != nil {
         t.Fatalf("ParseBulkString returned an error, %s", err)
     }
-    if p.commands[0] != "SET" {
+    if p.Commands[0] != "SET" {
         t.Fatalf("ParseBulkString did not parse correctly, expected=%s, got=%s",
-        "SET", p.commands[0])
+        "SET", p.Commands[0])
     }
 }
 
@@ -112,43 +112,43 @@ func TestParseBulkString(t *testing.T) {
 func TestParseArray(t *testing.T) {
     input := "*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$7\r\nmyvalue\r\n"
 
-    p := New(input)
+    p := New(input, DEFAULT_DELIMITER)
     err := p.ParseArray()
 
     if err != nil {
         t.Fatalf("ParseArray returned an error, %s", err)
     }
 
-    if len(p.commands) != 3 {
+    if len(p.Commands) != 3 {
         t.Fatalf("ParseArray returned wrong length, expected=%d, got=%d",
-        3, len(p.commands))
+        3, len(p.Commands))
     }
 
     expected := []string{"SET", "mykey", "myvalue"}
-    if !reflect.DeepEqual(p.commands, expected) {
+    if !reflect.DeepEqual(p.Commands, expected) {
         t.Fatalf("ParseArray returned wrong length, expected=%d, got=%d",
-        3, len(p.commands))
+        3, len(p.Commands))
     }
 }
 
 func TestParseInt(t *testing.T) {
     input := ":10\r\n"
-    p := New(input)
+    p := New(input, DEFAULT_DELIMITER)
     err := p.ParseInt()
 
     if err != nil {
         t.Fatalf("ParseInt returned an error, %s", err)
     }
 
-    if p.commands[0] != "10" {
+    if p.Commands[0] != "10" {
         t.Fatalf("ParseInt returned wrong int, expected=%s, got=%s",
-        "10", p.commands[0])
+        "10", p.Commands[0])
     }
 }
 
 func TestParseSize(t *testing.T) {
     input := "*10\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$7\r\nmyvalue\r\n"
-    p := New(input)
+    p := New(input, DEFAULT_DELIMITER)
     p.currPos = 1
     res := p.ParseSize()
 

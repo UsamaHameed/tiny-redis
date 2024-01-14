@@ -9,25 +9,28 @@ import (
 	"github.com/UsamaHameed/tiny-redis/utils"
 )
 
-const DELIMITER = "\\r\\n"
+// had to escape the \r and \n chars so that I could test using
+// nc on the command line
+const DEFAULT_DELIMITER = "\r\n"
 
 type Parser struct {
     currPos int
     input string
+    delimiter string
     Commands []string
 }
 
-func New(str string) *Parser {
-    p := Parser{ currPos: 0, input: str }
+func New(str string, delimiter string) *Parser {
+    p := Parser{ currPos: 0, input: str, delimiter: delimiter }
     return &p
 }
 
 func (p *Parser) advancePointer() {
     str := p.input[p.currPos:]
-    index := strings.Index(str, DELIMITER)
+    index := strings.Index(str, p.delimiter)
 
     if index != -1 {
-        p.currPos = index + p.currPos + len(DELIMITER)
+        p.currPos = index + p.currPos + len(p.delimiter)
     } else {
         p.currPos = len(p.input)
     }
@@ -41,14 +44,9 @@ func (p *Parser) appendParsedString(str string) {
     p.Commands = append(p.Commands, str)
 }
 
-func (p *Parser) trimCommas() {
-    p.input = p.input[1:len(p.input) - 1]
-}
-
 func (p *Parser) ParseRespString() error {
     fmt.Println("input to ParseRespString", p.input)
     if len(p.input) > 0 {
-        //p.trimCommas()
         respType := p.input[p.currPos]
         str := p.input[1:]
 
@@ -76,7 +74,7 @@ func (p *Parser) ParseRespString() error {
 func (p *Parser) parseSimpleString() error {
     p.incrementPointer() // skip the type
     start := p.currPos
-    end := strings.Index(p.input[start:], DELIMITER)
+    end := strings.Index(p.input[start:], p.delimiter)
     str := strings.ToLower(p.input[p.currPos:end + 1])
 
     if str == "ping" {
@@ -96,7 +94,7 @@ func (p *Parser) parseSimpleString() error {
 func (p *Parser) ParseSize() int {
     current := p.input[p.currPos:]
     start := 0
-    end := strings.Index(current, DELIMITER)
+    end := strings.Index(current, p.delimiter)
     fmt.Println("current", current, "start", start, "end", end)
     input := current[start:end]
     size, err := utils.ParseByteToInt([]rune(input))
@@ -113,9 +111,9 @@ func (p *Parser) ParseBulkString() error {
     p.incrementPointer() // skip the type
     input := p.input[p.currPos:]
     size := p.ParseSize()
-    index := strings.Index(input, DELIMITER)
+    index := strings.Index(input, p.delimiter)
 
-    start := index + len(DELIMITER)
+    start := index + len(p.delimiter)
     end := start + size
 
     comm := input[start:end]
@@ -133,7 +131,7 @@ func (p *Parser) ParseBulkString() error {
 
 func (p *Parser) ParseInt() error {
     start := 1 // skip the type
-    end := strings.Index(p.input[1:], DELIMITER)
+    end := strings.Index(p.input[1:], p.delimiter)
 
     input := p.input[start:end + 1]
     i, e := strconv.ParseInt(input, 10, 64)
