@@ -23,13 +23,12 @@ func (s *server) handleConnection(conn net.Conn) {
     // serve the connection as long as the TCP client desires
     // todo: add a timeout?
     for {
-        data, err := bufio.NewReader(conn).ReadString('\n')
+        str, err := bufio.NewReader(conn).ReadString('\n')
         if err != nil {
             fmt.Println("unable to create a read buffer")
             //panic(err)
         }
 
-        str := strings.TrimSpace(string(data))
         fmt.Println("received command", str)
 
         if str == "STOP" {
@@ -39,9 +38,9 @@ func (s *server) handleConnection(conn net.Conn) {
 
         res := commands.ParseCommand(str)
 
-        if res.Success {
+        if true {
             fmt.Println("responding with", res, "to", conn.RemoteAddr().String())
-            conn.Write([]byte(res.Response))
+            conn.Write([]byte(strings.Join(res, " ")))
         }
 
     }

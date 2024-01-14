@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
-	"strings"
 
+	"github.com/UsamaHameed/tiny-redis/parser"
 	"github.com/UsamaHameed/tiny-redis/storage"
 )
 
@@ -17,32 +17,25 @@ type ParseCommandResponse struct {
     Errors   []string
 }
 
-func ParseCommand(input string) *ParseCommandResponse {
-    chunks := strings.Split(input, " ")
-    comm := chunks[0]
+func ParseCommand(input string) []string {
+    //chunks := strings.Split(input, " ")
+    //comm := chunks[0]
 
-    if comm == "PING" {
-        return &ParseCommandResponse{ Response: Ping(), Success: true}
-    } else if comm == "ECHO" {
-        return &ParseCommandResponse{ Response: Echo(chunks[1]), Success: true}
-    } else if comm == "SET" {
-        return &ParseCommandResponse{
-            Response: "", Success: Set(chunks[1], chunks[2]),
-        }
-    } else {
-        return &ParseCommandResponse{
-            Success: false, Response: "", Errors: []string{
-                fmt.Sprintf("unknown command %s", comm),
-            },
-        }
-    }
+    p := parser.New(input)
+    p.ParseRespString()
+    fmt.Println("commands", p.Commands)
+
+    return p.Commands
 }
 
+type CommandType string
 const (
-    PING = iota
-    ECHO
-    SET
-    GET
+    PING    CommandType = "PING"
+    ECHO    CommandType = "ECHO"
+    SET     CommandType = "SET"
+    GET     CommandType = "GET"
+    EXISTS  CommandType = "EXISTS"
+    OK      CommandType = "OK"
 )
 
 func Ping() string {
