@@ -25,27 +25,41 @@ func (s *server) handleConnection(conn net.Conn) {
     for {
         str, err := bufio.NewReader(conn).ReadString('\n')
         if err != nil {
-            fmt.Println("unable to create a read buffer")
-            //panic(err)
+            // handle SIGINT/SIGTERM from the client
+            if err.Error() == "EOF" {
+                fmt.Printf("connection closed with %s \n", conn.RemoteAddr().String())
+            } else {
+                fmt.Println("unable to create a read buffer")
+            }
+            return
         }
 
         fmt.Println("received command", str)
 
-        if str == "STOP" {
+        // trim any newline char
+        if strings.TrimSpace(str) == "STOP" {
             fmt.Println("closed connection with", conn.RemoteAddr().String())
             break
         }
 
-        res := commands.ParseCommand(str)
+        res := commands.ProcessCommand(str)
 
-        if true {
+        if res.Success {
             fmt.Println("responding with", res, "to", conn.RemoteAddr().String())
-            conn.Write([]byte(strings.Join(res, " ")))
+            conn.Write([]byte(res.Response))
+        } else {
+            fmt.Printf("error executing command, responding with %v to: %s",
+                res, conn.RemoteAddr().String())
+            msg := ""
+            for _, e := range res.Errors {
+                msg += e
+            }
+
+            conn.Write([]byte(msg))
         }
 
     }
     conn.Close()
-
 }
 
 func (s *server) acceptConnections() {

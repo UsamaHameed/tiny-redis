@@ -5,25 +5,31 @@ package storage
 // save to file
 // handle expiry time
 
+type Storage struct {}
+
+func New() *Storage {
+    return &Storage{}
+}
+
 type KeyValueStore struct {
-    data map[string] string
+    Data map[string] string
 }
 
 var redisData KeyValueStore
 
-func Init(initData KeyValueStore) {
-    redisData.data = make(map[string]string)
-    for k, v := range initData.data {
-        redisData.data[k] = v
+func (s *Storage) Init(initData map[string]string) {
+    redisData.Data = make(map[string]string)
+    for k, v := range initData {
+        redisData.Data[k] = v
     }
 }
 
-func Store(key string, value string) bool {
-    redisData.data[key] = value
+func (s *Storage) Store(key string, value string) bool {
+    redisData.Data[key] = value
     return true
 }
 
-func Retrieve(key string) string {
-    return redisData.data[key]
+func (s *Storage) Retrieve(key string) string {
+    return redisData.Data[key]
 }
 

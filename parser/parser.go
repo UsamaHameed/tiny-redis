@@ -44,9 +44,17 @@ func (p *Parser) appendParsedString(str string) {
     p.Commands = append(p.Commands, str)
 }
 
+func (p *Parser) trimQuotes() {
+    length := len(p.input)
+    if (p.input[0] == '"' && p.input[length - 1] == '"') {
+        p.input = p.input[1:length - 1]
+    }
+}
+
 func (p *Parser) ParseRespString() error {
-    fmt.Println("input to ParseRespString", p.input)
+    //fmt.Println("input to ParseRespString", p.input)
     if len(p.input) > 0 {
+        p.trimQuotes()
         respType := p.input[p.currPos]
         str := p.input[1:]
 
@@ -95,7 +103,6 @@ func (p *Parser) ParseSize() int {
     current := p.input[p.currPos:]
     start := 0
     end := strings.Index(current, p.delimiter)
-    fmt.Println("current", current, "start", start, "end", end)
     input := current[start:end]
     size, err := utils.ParseByteToInt([]rune(input))
 
@@ -121,7 +128,7 @@ func (p *Parser) ParseBulkString() error {
         panic(fmt.Sprintf("invalid bulk string=%s", input))
     }
 
-    fmt.Println("parsing bulk string", comm)
+    //fmt.Println("parsing bulk string", comm)
 
     p.advancePointer()
     p.appendParsedString(comm)

@@ -1,11 +1,13 @@
 package main
 
 import (
-    "fmt"
-    "os"
-    "syscall"
-    "os/signal"
-    "github.com/UsamaHameed/tiny-redis/server"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/UsamaHameed/tiny-redis/server"
+	"github.com/UsamaHameed/tiny-redis/storage"
 )
 
 func main() {
@@ -17,6 +19,8 @@ func main() {
     }
 
     s.Start()
+    store := storage.New()
+    store.Init(make(map[string]string))
 
     signalChan := make(chan os.Signal, 1)
     signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)

@@ -157,3 +157,11 @@ func TestParseSize(t *testing.T) {
         10, res)
     }
 }
+
+//func TestTrimQuotes(t *testing.T) {
+//    input := "\"abc\""
+//
+//    p := New(input, DEFAULT_DELIMITER)
+//
+//    p.trimQuotes()
+//}

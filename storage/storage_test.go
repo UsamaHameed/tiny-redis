@@ -2,17 +2,11 @@ package storage
 
 import "testing"
 
-func setupTests(d KeyValueStore) {
-    Init(d)
-}
-
 func TestStore(t *testing.T) {
-    data := make(map[string]string)
-    initdata := KeyValueStore{data:data}
+    s := New()
+    s.Init(map[string]string{})
 
-    setupTests(initdata)
-
-    res := Store("Name", "John")
+    res := s.Store("Name", "John")
 
     if !res {
         t.Fatalf("unable to store")
@@ -20,12 +14,13 @@ func TestStore(t *testing.T) {
 }
 
 func TestRetrieve(t *testing.T) {
-    data := make(map[string]string)
-    data["Name"] = "John"
-    initdata := KeyValueStore{data:data}
-    setupTests(initdata)
+    s := New()
+    initData := make(map[string]string)
+    initData["Name"] = "John"
 
-    res := Retrieve("Name")
+    s.Init(initData)
+
+    res := s.Retrieve("Name")
 
     if res != "John" {
         t.Fatalf("retrieve does not work, expected=%s, got=%s", "John", res)
