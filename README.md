@@ -67,3 +67,6 @@ $12\r\nRedis\r\n
 # TODO
 - a cron job to build since artifacts get deleted in 90 days?
 - add testing guide with files `nc localhost 6379 < file`
+- save to file
+- handle expiry time
+- handle concurrent writes and reads
