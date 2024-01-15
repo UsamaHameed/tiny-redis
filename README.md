@@ -35,18 +35,25 @@ transferred from one process to another.
 curl -OL https://github.com/UsamaHameed/tiny-redis/releases/latest/download/tiny-redis
 ```
 
+run the server with:
+```bash
+./tiny-redis
+```
+
 ## build from source
 ```bash
 git clone git@github.com:UsamaHameed/tiny-redis.git
 go build
 ```
 
+run the server with:
+```bash
+./tiny-redis
+```
+
 # How to test
 
 ```bash
-# start the server
-go run main.go
-
 # connect to redis via tcp and then try sending any of the resp strings
 nc localhost 6379
 # resp strings to try
