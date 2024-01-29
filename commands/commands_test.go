@@ -31,7 +31,7 @@ func TestEcho(t *testing.T) {
 }
 func TestSet(t *testing.T) {
     c := []string{"set", "key", "value"}
-    s := storage.New()
+    s := storage.New("/tmp/test")
     s.Init(map[string]string{})
 
     res := Set(s, c)
@@ -56,7 +56,7 @@ func TestSet(t *testing.T) {
 }
 func TestGet(t *testing.T) {
     c := []string{"get", "key"}
-    s := storage.New()
+    s := storage.New("/tmp/test")
     s.Init(map[string]string{"key": "value"})
 
     res := Get(s, c)

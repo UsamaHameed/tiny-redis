@@ -70,3 +70,4 @@ $12\r\nRedis\r\n
 - save to file
 - handle expiry time
 - handle concurrent writes and reads
+- properly explain how the cuncurrency works

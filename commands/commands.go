@@ -18,7 +18,7 @@ type RedisResponse struct {
 }
 
 func ProcessCommand(input string) RedisResponse {
-    s := storage.New()
+    s := storage.New("/tmp/redis-server/data")
     p := parser.New(input, "\\r\\n")
     p.ParseRespString()
 
